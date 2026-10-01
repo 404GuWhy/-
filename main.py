@@ -1,6 +1,8 @@
 import telebot
 import random
 
+# import TOKEN from config - если в визуал коде
+
 # вставьте сюда токен вашего бота
 TOKEN = 'ваш токен'
 bot = telebot.TeleBot(TOKEN)
