@@ -1,11 +1,11 @@
 import telebot
 import random
 
-# Вставьте сюда токен вашего бота
-TOKEN = '8122902406:AAEUmI0H7w7kfMY_CXSf3Ersxym8cl1cU-U'
+# вставьте сюда токен вашего бота
+TOKEN = 'ваш токен'
 bot = telebot.TeleBot(TOKEN)
 
-# Короткие и простые факты
+# короткиесфакты
 facts = [
     "Меньше мяса — меньше выбросов. Попробуй заменить говядину курицей или овощами хотя бы раз в неделю.",
     "Ходи пешком или катайся на велосипеде. Короткие поездки без машины — большой плюс для планеты.",
@@ -21,7 +21,7 @@ facts = [
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Привет! Отправь /antiglobalwarmingfact — и я пришлю простой факт о том, как помочь планете.")
+    bot.reply_to(message, "Привет! Отправь /antiglobalwarmingfact - и я пришлю простой факт о том, как помочь планете.")
 
 @bot.message_handler(commands=['antiglobalwarmingfact'])
 def send_fact(message):
