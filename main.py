@@ -1,5 +1,6 @@
 import telebot
 import random
+from telebot import types
 
 # import TOKEN from config - если в визуал коде
 
@@ -7,7 +8,7 @@ import random
 TOKEN = 'ваш токен'
 bot = telebot.TeleBot(TOKEN)
 
-# короткиесфакты
+# короткие факты
 facts = [
     "Меньше мяса — меньше выбросов. Попробуй заменить говядину курицей или овощами хотя бы раз в неделю.",
     "Ходи пешком или катайся на велосипеде. Короткие поездки без машины — большой плюс для планеты.",
@@ -21,13 +22,27 @@ facts = [
     "Отключай зарядку из розетки. Даже без телефона она продолжает тратить электричество."
 ]
 
+def fact_keyboard():
+    """Кнопка «Ещё факт» под каждым фактом."""
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("🔄 Ещё факт", callback_data="get_fact"))
+    return markup
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Привет! Отправь /antiglobalwarmingfact - и я пришлю простой факт о том, как помочь планете.")
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("🌱 Получить факт", callback_data="get_fact"))
+    bot.reply_to(message, "Привет! Нажми кнопку ниже — и я пришлю простой факт о том, как помочь планете.", reply_markup=markup)
 
 @bot.message_handler(commands=['antiglobalwarmingfact'])
 def send_fact(message):
     fact = random.choice(facts)
-    bot.reply_to(message, fact)
+    bot.reply_to(message, fact, reply_markup=fact_keyboard())
+
+@bot.callback_query_handler(func=lambda call: call.data == "get_fact")
+def callback_fact(call):
+    fact = random.choice(facts)
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, fact, reply_markup=fact_keyboard())
 
 bot.polling(none_stop=True)
