@@ -22,6 +22,9 @@ facts = [
     "Отключай зарядку из розетки. Даже без телефона она продолжает тратить электричество."
 ]
 
+# счётчик фактов по каждому пользователю: {user_id: количество}
+user_fact_count = {}
+
 def fact_keyboard():
     """Кнопка «Ещё факт» под каждым фактом."""
     markup = types.InlineKeyboardMarkup()
@@ -36,13 +39,37 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['antiglobalwarmingfact'])
 def send_fact(message):
+    user_id = message.from_user.id
+    user_fact_count[user_id] = user_fact_count.get(user_id, 0) + 1
+
     fact = random.choice(facts)
     bot.reply_to(message, fact, reply_markup=fact_keyboard())
 
+@bot.message_handler(commands=['howmanyfacts'])
+def how_many_facts(message):
+    user_id = message.from_user.id
+    count = user_fact_count.get(user_id, 0)
+
+    if count == 0:
+        bot.reply_to(message, "Ты ещё не запрашивал факты. Нажми /antiglobalwarmingfact или кнопку «🌱 Получить факт».")
+    else:
+        bot.reply_to(message, f"Ты запрашивал факты {count} раз(а). 🌍")
+
 @bot.callback_query_handler(func=lambda call: call.data == "get_fact")
 def callback_fact(call):
+    user_id = call.from_user.id
+    user_fact_count[user_id] = user_fact_count.get(user_id, 0) + 1
+
     fact = random.choice(facts)
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, fact, reply_markup=fact_keyboard())
 
-bot.polling(none_stop=True)
+# список команд, который видно при вводе «/» в Telegram
+bot.set_my_commands([
+    types.BotCommand("start", "Начать работу"),
+    types.BotCommand("help", "Помощь"),
+    types.BotCommand("antiglobalwarmingfact", "Получить факт о планете"),
+    types.BotCommand("howmanyfacts", "Сколько фактов ты уже получил"),
+])
+
+bot.infinity_polling()
